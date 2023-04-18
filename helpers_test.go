@@ -1,7 +1,6 @@
 package gosteganography
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 )
@@ -61,7 +60,7 @@ func Test_bin2num(t *testing.T) {
 func Test_resize(t *testing.T) {
 	t.Run("padding", func(t *testing.T) {
 		input := []uint{1, 1, 0, 0}
-		expected := []uint{1, 1, 0, 0, 0, 0}
+		expected := []uint{0, 0, 1, 1, 0, 0}
 		if got := resize(input, 6); !reflect.DeepEqual(expected, got) {
 			t.Errorf("expected %v, got %v", expected, got)
 		}
@@ -85,7 +84,6 @@ func Test_resize(t *testing.T) {
 func Test_encodeAndDecode(t *testing.T) {
 	expected := []byte("hello world!")
 	got := decodeMessage(encodeMessage(expected))
-	fmt.Println(string(expected), string(got))
 	if !reflect.DeepEqual(expected, got) {
 		t.Errorf("expected %v, got %v", expected, got)
 	}
