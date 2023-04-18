@@ -5,29 +5,44 @@ package gosteganography
 
 const bitsPerByte = 8
 
+// num2bin function gets the binary representation of the number provided and
+// returns it in a slice of unsigned integers.
 func num2bin(num uint) []uint {
 	res := []uint{}
+	// iterate over the number of bits using the bitwise right shift operator
+	// to move over the number in binary
 	for i := num; i != 0; i >>= 1 {
+		// append the last bit using the bitwise and operator
 		res = append(res, i&1)
 	}
+	// reverse the binary representation
 	for i, j := 0, len(res)-1; i < j; i, j = i+1, j-1 {
 		res[i], res[j] = res[j], res[i]
 	}
 	return res
 }
 
+// bin2num function gets the decimal representation of the slice of bits
+// (uint's) provided and returns it in a unsigned integer.
 func bin2num(bin []uint) uint {
+	// reverse back the binary representation
 	for i, j := 0, len(bin)-1; i < j; i, j = i+1, j-1 {
 		bin[i], bin[j] = bin[j], bin[i]
 	}
-
 	result := uint(0)
+	// rebuild the number using the bitwise left shift and or operators
 	for i := len(bin); i > 0; i-- {
 		result = (result << 1) | bin[i-1]
 	}
 	return result
 }
 
+// resize function returns the given bit slice modified to fit the given size:
+//   - If the given size is less than the length of the input, it truncates the
+//     input.
+//   - If the size is greater than the length of the input, padding is added.
+//   - If the given size is the current length, the input is returned
+//     unmodified.
 func resize(bits []uint, to int) []uint {
 	n := to - len(bits)
 	if n > 0 {
@@ -39,6 +54,8 @@ func resize(bits []uint, to int) []uint {
 	return bits
 }
 
+// split function returns the given slice of unsigned ints, split into groups
+// of the given size.
 func split(input []uint, size int) [][]uint {
 	var chunks [][]uint
 	for {
@@ -55,6 +72,8 @@ func split(input []uint, size int) [][]uint {
 	return chunks
 }
 
+// encodeMessage function iterates over the bytes of the provided slice, gets
+// its binary representation and returns them concatenated.
 func encodeMessage(msg []byte) []uint {
 	res := []uint{}
 	for _, ibyte := range msg {
@@ -65,6 +84,8 @@ func encodeMessage(msg []byte) []uint {
 	return res
 }
 
+// decodeMessage function splits the given binary slice into bits of bytes,
+// gets the decimal byte code of them and returns them in a slice of bytes.
 func decodeMessage(bin []uint) []byte {
 	res := []byte{}
 	for _, ibinbyte := range split(bin, bitsPerByte) {
