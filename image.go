@@ -1,6 +1,7 @@
 package gosteganography
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"image/png"
@@ -8,7 +9,6 @@ import (
 
 	_ "image/gif"
 	_ "image/jpeg"
-	_ "image/png"
 )
 
 type pixel struct {
@@ -16,14 +16,14 @@ type pixel struct {
 	color color.Color
 }
 
-type img struct {
+type Img struct {
 	original image.Image
 	bounds   image.Rectangle
 	imgType  string
 	pixels   []*pixel
 }
 
-func readFile(path string) (*img, error) {
+func Open(path string) (*Img, error) {
 	reader, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func readFile(path string) (*img, error) {
 	if err != nil {
 		return nil, err
 	}
-	res := &img{
+	res := &Img{
 		original: original,
 		bounds:   original.Bounds(),
 		imgType:  itype,
@@ -49,38 +49,74 @@ func readFile(path string) (*img, error) {
 	return res, err
 }
 
-func (i *img) bytesAvailable() int {
+func (i *Img) BytesAvailable() int {
 	return len(i.pixels) * 3 / 8 // 3 color components divided by number of bits in a byte
 }
 
-func (i *img) hide(bmsg []byte) {
+func (i *Img) Hide(msg []byte) (int, error) {
+	if len(msg) > i.BytesAvailable() {
+		return 0, fmt.Errorf("available bytes limit exceeded")
+	}
+	bmsg := encodeMessage(msg)
 	newPixels := make([]*pixel, len(i.pixels))
 
 	idx := 0
 	mgsLen := len(bmsg)
-	for i, p := range i.pixels {
+	for n, p := range i.pixels {
 		r, g, b, a := p.color.RGBA()
 
 		if idx < mgsLen {
-			r += uint32(bmsg[idx])
+			br := num2bin(uint(r))
+			br[len(br)-1] = bmsg[idx]
+			r = uint32(bin2num(br))
 		}
 		if idx+1 < mgsLen {
-			g += uint32(bmsg[idx+1])
+			bg := num2bin(uint(g))
+			bg[len(bg)-1] = bmsg[idx+1]
+			g = uint32(bin2num(bg))
 		}
 		if idx+2 < mgsLen {
-			b += uint32(bmsg[idx+2])
+			bb := num2bin(uint(b))
+			bb[len(bb)-1] = bmsg[idx+2]
+			b = uint32(bin2num(bb))
 		}
 
-		newPixels[i] = &pixel{
+		newPixels[n] = &pixel{
 			x: p.x, y: p.y,
 			color: color.RGBA{uint8(r), uint8(g), uint8(b), uint8(a)},
 		}
 		idx += 3
 	}
 	i.pixels = newPixels
+	return len(bmsg), nil
 }
 
-func (i *img) writeFile(path string) error {
+func (i *Img) Unhide(nbits int) []byte {
+	bmsg := []uint{}
+
+	currentBit := 0
+	for _, p := range i.pixels {
+		r, g, b, _ := p.color.RGBA()
+
+		if currentBit < nbits {
+			br := num2bin(uint(r))
+			bmsg = append(bmsg, br[len(br)-1])
+		}
+		if currentBit+1 < nbits {
+			bg := num2bin(uint(g))
+			bmsg = append(bmsg, bg[len(bg)-1])
+		}
+		if currentBit+2 < nbits {
+			bb := num2bin(uint(b))
+			bmsg = append(bmsg, bb[len(bb)-1])
+		}
+		currentBit += 3
+	}
+
+	return decodeMessage(bmsg)
+}
+
+func (i *Img) Save(path string) error {
 	var newImage = image.NewRGBA(i.bounds)
 	for _, pix := range i.pixels {
 		newImage.Set(pix.x, pix.y, pix.color)
