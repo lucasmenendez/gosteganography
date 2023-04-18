@@ -1,3 +1,6 @@
+// Copyright (c) 2023, Lucas Menendez <hi@lucasmenendez.me>
+// See LICENSE for licensing information
+
 package gosteganography
 
 import (

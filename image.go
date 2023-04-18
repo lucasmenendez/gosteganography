@@ -1,3 +1,6 @@
+// Copyright (c) 2023, Lucas Menendez <hi@lucasmenendez.me>
+// See LICENSE for licensing information
+
 package gosteganography
 
 import (
@@ -6,9 +9,6 @@ import (
 	"image/color"
 	"image/png"
 	"os"
-
-	_ "image/gif"
-	_ "image/jpeg"
 )
 
 type pixel struct {
@@ -28,10 +28,17 @@ func Open(path string) (*Img, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	defer reader.Close()
 	original, itype, err := image.Decode(reader)
 	if err != nil {
 		return nil, err
+	}
+	switch itype {
+	case "png":
+		break
+	// TODO: add support to other formats
+	default:
+		return nil, fmt.Errorf("no supported image format '%s'", itype)
 	}
 	res := &Img{
 		original: original,
@@ -39,13 +46,11 @@ func Open(path string) (*Img, error) {
 		imgType:  itype,
 		pixels:   []*pixel{},
 	}
-
 	for y := res.bounds.Min.Y; y < res.bounds.Max.Y; y++ {
 		for x := res.bounds.Min.X; x < res.bounds.Max.X; x++ {
 			res.pixels = append(res.pixels, &pixel{x, y, original.At(x, y)})
 		}
 	}
-
 	return res, err
 }
 
@@ -59,12 +64,10 @@ func (i *Img) Hide(msg []byte) (int, error) {
 	}
 	bmsg := encodeMessage(msg)
 	newPixels := make([]*pixel, len(i.pixels))
-
 	idx := 0
 	mgsLen := len(bmsg)
 	for n, p := range i.pixels {
 		r, g, b, a := p.color.RGBA()
-
 		if idx < mgsLen {
 			br := num2bin(uint(r))
 			br[len(br)-1] = bmsg[idx]
@@ -80,7 +83,6 @@ func (i *Img) Hide(msg []byte) (int, error) {
 			bb[len(bb)-1] = bmsg[idx+2]
 			b = uint32(bin2num(bb))
 		}
-
 		newPixels[n] = &pixel{
 			x: p.x, y: p.y,
 			color: color.RGBA{uint8(r), uint8(g), uint8(b), uint8(a)},
@@ -93,11 +95,9 @@ func (i *Img) Hide(msg []byte) (int, error) {
 
 func (i *Img) Unhide(nbits int) []byte {
 	bmsg := []uint{}
-
 	currentBit := 0
 	for _, p := range i.pixels {
 		r, g, b, _ := p.color.RGBA()
-
 		if currentBit < nbits {
 			br := num2bin(uint(r))
 			bmsg = append(bmsg, br[len(br)-1])
@@ -117,20 +117,20 @@ func (i *Img) Unhide(nbits int) []byte {
 }
 
 func (i *Img) Save(path string) error {
-	var newImage = image.NewRGBA(i.bounds)
-	for _, pix := range i.pixels {
-		newImage.Set(pix.x, pix.y, pix.color)
-	}
-
 	output, err := os.Create(path)
 	if err != nil {
 		return err
 	}
-
+	defer output.Close()
+	var newImage = image.NewRGBA(i.bounds)
+	for _, pix := range i.pixels {
+		newImage.Set(pix.x, pix.y, pix.color)
+	}
 	switch i.imgType {
 	case "png":
 		return png.Encode(output, newImage)
+	// TODO: add support to other formats
+	default:
+		return fmt.Errorf("no supported image format '%s'", i.imgType)
 	}
-
-	return nil
 }
