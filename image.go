@@ -4,7 +4,6 @@
 package gosteganography
 
 import (
-	"fmt"
 	"image"
 	"image/png"
 	"os"
@@ -19,19 +18,19 @@ type Image struct {
 func Open(path string) (*Image, error) {
 	reader, err := os.Open(path)
 	if err != nil {
-		return nil, err
+		return nil, wrap(ErrOpeningFile, "path '%s': %w", path, err)
 	}
 	defer reader.Close()
 	original, itype, err := image.Decode(reader)
 	if err != nil {
-		return nil, err
+		return nil, wrap(ErrDecodingImage, "from file '%s': %w", path, err)
 	}
 	switch itype {
 	case "png":
 		break
 	// TODO: add support to other formats
 	default:
-		return nil, fmt.Errorf("no supported image format '%s'", itype)
+		return nil, wrap(ErrFormatNotSupported, "format provided: '%s'", itype)
 	}
 	newImage := &Image{
 		original: original,
@@ -49,7 +48,7 @@ func (i *Image) BytesAvailable() int {
 
 func (i *Image) Hide(msg []byte) (int, error) {
 	if len(msg) > i.BytesAvailable() {
-		return 0, fmt.Errorf("available bytes limit exceeded")
+		return 0, ErrBytesLimitExceeded
 	}
 	bmsg := encodeMessage(msg)
 	i.pixels = i.pixels.writebin(bmsg)
@@ -63,7 +62,7 @@ func (i *Image) Unhide(nbits int) []byte {
 func (i *Image) Save(path string) error {
 	output, err := os.Create(path)
 	if err != nil {
-		return err
+		return wrap(ErrWrittingFile, "path '%s': %w", path, err)
 	}
 	defer output.Close()
 	var newImage = image.NewRGBA(i.original.Bounds())
