@@ -13,7 +13,7 @@ func Example() {
 		fmt.Println(err)
 		return
 	}
-	// hide a message, it returns the number of bits writen
+	// hide a message, it returns the number of bits written
 	nbits, err := image.Hide(expected)
 	if err != nil {
 		fmt.Println(err)

@@ -5,7 +5,7 @@ package gosteganography
 
 import "image/color"
 
-// pixel struct contains the coordenates of the pixel and its color
+// pixel struct contains the coordinates of the pixel and its color
 // (color.Color) reference
 type pixel struct {
 	x, y  int
@@ -21,7 +21,7 @@ func (ps pixels) from(img *Image) pixels {
 	// get original image bounds from Image provided
 	bounds := img.original.Bounds()
 	// iterates over every original image pixels storing their colors and
-	// coordenates
+	// coordinates
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			ps = append(ps, &pixel{x, y, img.original.At(x, y)})

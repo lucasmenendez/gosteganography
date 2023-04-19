@@ -10,7 +10,7 @@ var (
 	ErrBytesLimitExceeded = fmt.Errorf("available bytes limit exceeded")
 	ErrOpeningFile        = fmt.Errorf("error opening file")
 	ErrDecodingImage      = fmt.Errorf("error decoding image")
-	ErrWrittingFile       = fmt.Errorf("error writting file")
+	ErrWrittingFile       = fmt.Errorf("error writing file")
 )
 
 // wrap function helps to create nested errors supporting string formating and
