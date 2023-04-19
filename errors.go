@@ -13,6 +13,8 @@ var (
 	ErrWrittingFile       = fmt.Errorf("error writting file")
 )
 
+// wrap function helps to create nested errors supporting string formating and
+// error comparation using errors.Is().
 func wrap(parent error, tmp string, args ...any) error {
 	return fmt.Errorf("%w: %w", parent, fmt.Errorf(tmp, args...))
 }
