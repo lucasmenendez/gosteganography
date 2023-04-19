@@ -35,25 +35,25 @@ go get github.com/lucasmenendez/gosteganography
 ```go
     // open the input image
     image, err := gosteganography.OpenFile("./input.png")
-	if err != nil {
-		log.Fatal(err)
-	}
+    if err != nil {
+        log.Fatal(err)
+    }
 ```
 2. Hide a message into the `gosteganograpy.Image`
 ```go
     // hide a message, it returns the number of bits writen
-	secret := []byte("secret number: 1234")
-	nbits, err := image.Hide(secret)
-	if err != nil {
-		log.Fatal(err)
-	}
+    secret := []byte("secret number: 1234")
+    nbits, err := image.Hide(secret)
+    if err != nil {
+        log.Fatal(err)
+    }
 ```
 3. Write the `gosteganograpy.Image` with the hidden message into a file
 ```go
     // store the output
-	if err := image.WriteFile("./output.png"); err != nil {
-		log.Fatal(err)
-	}
+    if err := image.WriteFile("./output.png"); err != nil {
+        log.Fatal(err)
+    }
 ```
 4. Share the image to someone with the number of bits writtem
 
@@ -63,16 +63,16 @@ go get github.com/lucasmenendez/gosteganography
 ```go
     // open the input image
     image, err := gosteganography.OpenFile("./input.png")
-	if err != nil {
-		log.Fatal(err)
-	}
+    if err != nil {
+        log.Fatal(err)
+    }
 ```
 
 2. Unhide the message that the `gosteganograpy.Image` contains with the number of bits written
 ```go
-   // get hided message using the number of bits
-	secret := image.Unhide(nbits)
-	fmt.Println(string(secret))
+    // get hided message using the number of bits
+    secret := image.Unhide(nbits)
+    fmt.Println(string(secret))
 ```
 
 #### Full example
