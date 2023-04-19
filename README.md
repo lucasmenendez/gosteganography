@@ -17,7 +17,7 @@ Steganography is the practice of hiding secret information within an innocuous c
 
 One common method of steganography is to use the least significant bit (LSB) technique, which involves replacing the least significant bit of each pixel in an image or the least significant sample in an audio file with a bit from the secret message. The LSBs are the bits that have the least impact on the overall value of the pixel or sample and therefore changing them slightly will not affect the quality of the media file.
 
-For example, if the value of a pixel is `10101110` in binary, the least significant bit would be 0. If we want to hide a binary message "1101" within the pixel, we can replace the last 4 bits of the pixel with the message bits, resulting in a new pixel value of `10101111`.
+For example, if the value of a pixel is `10101110` in binary, the least significant bit would be 0. If we want to hide a binary message `1101` within the pixel, we can replace the last 4 bits of the pixel with the message bits, resulting in a new pixel value of `10101111`.
 
 By repeating this process for all pixels in the image, we can encode the entire secret message. To extract the message, the LSBs of each pixel are simply read and assembled together to reconstruct the original binary message.
 
