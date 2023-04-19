@@ -21,7 +21,7 @@ However, it is worth noting that LSB steganography is a relatively simple and ea
 ## Use & example 
 
 ### Installation
-To include `go-steganography` as package dependency run:
+To include `gosteganography` as package dependency run:
 
 ```sh
 go get github.com/lucasmenendez/gosteganography
