@@ -8,7 +8,7 @@ import "fmt"
 func Example() {
 	expected := []byte("secret number: 1234")
 	// open the input image
-	image, err := Open("./input.png")
+	image, err := OpenFile("./input.png")
 	if err != nil {
 		fmt.Println(err)
 		return
