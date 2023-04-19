@@ -1,8 +1,13 @@
+[![GoDoc](https://godoc.org/github.com/lucasmenendez/gosteganography?status.svg)](https://godoc.org/github.com/lucasmenendez/gosteganography) 
+[![Go Report Card](https://goreportcard.com/badge/github.com/lucasmenendez/gosteganography)](https://goreportcard.com/report/github.com/lucasmenendez/gosteganography)
+[![test](https://github.com/lucasmenendez/gosteganography/workflows/test/badge.svg)](https://github.com/lucasmenendez/gosteganography/actions?query=workflow%3Atest)
+[![license](https://img.shields.io/github/license/lucasmenendez/gosteganography)](LICENSE)
+
 # gosteganography
 Simple implementation of the LSB steganography algorithm in go, which uses the least significant bit (LSB) of each colour component (RGB) of each pixel of an image to hide a given message. 
 
 It can be used in three ways:
- 1. **As a library:** Check the documentation [here]().
+ 1. **As a library:** Check the documentation [here](https://pkg.go.dev/github.com/lucasmenendez/gosteganography).
  2. **As CLI:**  -> *coming soon*
  3. **As web app:** (using WASM) -> *coming soon*
 
