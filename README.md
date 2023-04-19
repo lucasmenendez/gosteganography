@@ -76,6 +76,11 @@ go get github.com/lucasmenendez/gosteganography
 ```
 
 #### Full example
+
+| Input image (original) | Output image (with message hidden) |
+|:---:|:---:|
+| <img src="./input.png"/> | <img src="./output.png"/> |
+
 ```go
     package main
 
