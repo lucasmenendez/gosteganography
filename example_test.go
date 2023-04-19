@@ -21,10 +21,10 @@ func Example() {
 	}
 	// get hided message using the number of bits
 	got := image.Unhide(nbits)
-	// [Optional] store the output
-	// if err := image.Save("./output.png"); err != nil {
-	// 	fmt.Println(err)
-	// }
+	// store the output
+	if err := image.WriteFile("./output.png"); err != nil {
+		fmt.Println(err)
+	}
 	fmt.Println(string(got))
 	// Output: secret number: 1234
 }
