@@ -15,6 +15,6 @@ var (
 
 // wrap function helps to create nested errors supporting string formating and
 // error comparation using errors.Is().
-func wrap(parent error, tmp string, args ...any) error {
+func wrap(parent error, tmp string, args ...interface{}) error {
 	return fmt.Errorf("%w: %w", parent, fmt.Errorf(tmp, args...))
 }
