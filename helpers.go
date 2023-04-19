@@ -3,6 +3,7 @@
 
 package gosteganography
 
+// bitsPerByte constant contains the number of bits in a byte
 const bitsPerByte = 8
 
 // num2bin function gets the binary representation of the number provided and
@@ -68,7 +69,6 @@ func split(input []uint, size int) [][]uint {
 		chunks = append(chunks, input[0:size])
 		input = input[size:]
 	}
-
 	return chunks
 }
 
@@ -80,7 +80,6 @@ func encodeMessage(msg []byte) []uint {
 		ibin := resize(num2bin(uint(ibyte)), bitsPerByte)
 		res = append(res, ibin...)
 	}
-
 	return res
 }
 
@@ -91,6 +90,5 @@ func decodeMessage(bin []uint) []byte {
 	for _, ibinbyte := range split(bin, bitsPerByte) {
 		res = append(res, byte(bin2num(ibinbyte)))
 	}
-
 	return res
 }
