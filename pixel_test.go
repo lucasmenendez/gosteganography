@@ -4,6 +4,7 @@
 package gosteganography
 
 import (
+	"os"
 	"reflect"
 	"testing"
 )
@@ -11,7 +12,11 @@ import (
 const testImage = "./input.png"
 
 func TestPixels_from(t *testing.T) {
-	img, err := OpenFile(testImage)
+	input, err := os.Open(testImage)
+	if err != nil {
+		t.Errorf("expected nil, got %v", err)
+	}
+	img, err := Read(input)
 	if err != nil {
 		t.Errorf("expected nil, got %s", err)
 	}
@@ -31,7 +36,11 @@ func TestPixels_from(t *testing.T) {
 }
 
 func TestPixels_writebin(t *testing.T) {
-	img, err := OpenFile(testImage)
+	input, err := os.Open(testImage)
+	if err != nil {
+		t.Errorf("expected nil, got %v", err)
+	}
+	img, err := Read(input)
 	if err != nil {
 		t.Errorf("expected nil, got %s", err)
 	}
@@ -68,7 +77,11 @@ func TestPixels_writebin(t *testing.T) {
 }
 
 func TestPixels_readbin(t *testing.T) {
-	img, err := OpenFile(testImage)
+	input, err := os.Open(testImage)
+	if err != nil {
+		t.Errorf("expected nil, got %v", err)
+	}
+	img, err := Read(input)
 	if err != nil {
 		t.Errorf("expected nil, got %s", err)
 	}

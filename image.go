@@ -9,7 +9,7 @@ package gosteganography
 import (
 	"image"
 	"image/png"
-	"os"
+	"io"
 )
 
 // Image struct abstracts the needed parameters to hide a message into it. It
@@ -21,18 +21,13 @@ type Image struct {
 	pixels   pixels
 }
 
-// OpenFile functions instance a Image struct froma the file located into the
-// path provided. It reads the original image file and decodes it. It then
-// initialises the Image pixels from the original image.Image.
-func OpenFile(path string) (*Image, error) {
-	reader, err := os.Open(path)
+// Read function instances a new Image struct from the io.Reader provided. It
+// reads the original image and decodes it. It then initialises the Image
+// pixels from the original image.Image.
+func Read(input io.Reader) (*Image, error) {
+	original, itype, err := image.Decode(input)
 	if err != nil {
-		return nil, wrap(ErrOpeningFile, "path '%s': %w", path, err)
-	}
-	defer reader.Close()
-	original, itype, err := image.Decode(reader)
-	if err != nil {
-		return nil, wrap(ErrDecodingImage, "from file '%s': %w", path, err)
+		return nil, wrap(ErrDecodingImage, "input reader err: %w", err)
 	}
 	switch itype {
 	case "png":
@@ -49,17 +44,11 @@ func OpenFile(path string) (*Image, error) {
 	return newImage, nil
 }
 
-// WriteFile function stores the current Image in the file located in the path
-// provided. It creates a new image.Image with the same dimensions of the
-// original image and writes every Image pixel in the new one. Then write the
-// new image.Image in a new file created in the path provided. It returns an
-// error if the create or write file processes fail.
-func (i *Image) WriteFile(path string) error {
-	output, err := os.Create(path)
-	if err != nil {
-		return wrap(ErrWrittingFile, "path '%s': %w", path, err)
-	}
-	defer output.Close()
+// Write function stores the current Image in io.Writer provided. It creates a
+// new image.Image with the same dimensions of the original image and writes
+// every Image pixel in the new one. Then write the new image.Image in the
+// io.Writer provided.
+func (i *Image) Write(output io.Writer) error {
 	var newImage = image.NewRGBA(i.original.Bounds())
 	for _, pix := range i.pixels {
 		newImage.Set(pix.x, pix.y, pix.color)

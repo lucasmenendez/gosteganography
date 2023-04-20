@@ -10,7 +10,11 @@ import (
 )
 
 func TestEnd2End(t *testing.T) {
-	image, err := OpenFile("./input.png")
+	input, err := os.Open("./input.png")
+	if err != nil {
+		t.Errorf("expected nil, got %v", err)
+	}
+	image, err := Read(input)
 	if err != nil {
 		t.Errorf("expected nil, got %v", err)
 	}
@@ -24,9 +28,14 @@ func TestEnd2End(t *testing.T) {
 	if !reflect.DeepEqual(expected, got) {
 		t.Errorf("expected %v, got %v", expected, got)
 	}
-	defer os.Remove("./temp_output.png")
-	if err := image.WriteFile("./temp_output.png"); err != nil {
+	output, err := os.Create("./temp_output.png")
+	if err != nil {
 		t.Errorf("expected nil, got %v", err)
 	}
+	defer output.Close()
 
+	defer os.Remove("./temp_output.png")
+	if err := image.Write(output); err != nil {
+		t.Errorf("expected nil, got %v", err)
+	}
 }

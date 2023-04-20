@@ -3,17 +3,25 @@
 
 package gosteganography
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 func Example() {
-	expected := []byte("secret number: 1234")
+	input, err := os.Open("./input.png")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	// open the input image
-	image, err := OpenFile("./input.png")
+	image, err := Read(input)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	// hide a message, it returns the number of bits written
+	expected := []byte("secret number: 1234")
 	nbits, err := image.Hide(expected)
 	if err != nil {
 		fmt.Println(err)
@@ -22,7 +30,14 @@ func Example() {
 	// get hided message using the number of bits
 	got := image.Unhide(nbits)
 	// store the output
-	if err := image.WriteFile("./output.png"); err != nil {
+	output, err := os.Create("./output.png")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer output.Close()
+
+	if err := image.Write(output); err != nil {
 		fmt.Println(err)
 	}
 	fmt.Println(string(got))
