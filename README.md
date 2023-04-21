@@ -8,7 +8,7 @@ Simple implementation of the LSB steganography algorithm in go, which uses the l
 
 It can be used in three ways:
  1. **As a library:** Check the documentation [here](https://pkg.go.dev/github.com/lucasmenendez/gosteganography).
- 2. **As CLI:**  -> *coming soon*
+ 2. **As CLI:**  Read more [here](#use-as-cli-tool).
  3. **As web app:** (using WASM) -> *coming soon*
 
 ### What is LSB Steganography?
@@ -25,38 +25,96 @@ However, it is worth noting that LSB steganography is a relatively simple and ea
 
 ## Use & example 
 
-### Installation
-To include `gosteganography` as package dependency run:
+### Use as CLI tool
+
+1. **Installation**
+
+    To include `gosteganography` as CLI run:
 
 ```sh
-go get github.com/lucasmenendez/gosteganography
+    go install github.com/lucasmenendez/gosteganography
 ```
 
-### Use
+2. **Run it!**
+
+    Lets try:
+
+```sh
+$ > gosteganography help
+
+GoSteganography CLI helps to you to hide a message in a PNG image and unhide it 
+from the output.
+
+Usage:
+
+        gosteganography <command> [arguments]
+
+The commands are:
+
+        hide    Hides the content of the secret file in a new copy of input image.
+        unhide  Recovers the content of the secret from the input image.
+```
+
+
+### Use in your own code
+
+1. **Installation**
+
+    To include `gosteganography` as package dependency run:
+
+```sh
+    go get github.com/lucasmenendez/gosteganography
+```
+
+2. **Import**
+
+    To use `gosteganography` on your application you need to import the following package:
+
+```go
+    package main
+
+    import "github.com/lucasmenendez/gosteganography/image"
+
+    func main() {
+        // ...
+    }
+```
 
 #### Hide a message
 
-1. Open image file
+1. Open an image file
 ```go
     // open the input image
-    image, err := gosteganography.OpenFile("./input.png")
+    input, err := os.Open("./input.png")
+    if err != nil {
+        fmt.Println(err)
+        return
+    }
+    defer input.Close()
+    img, err := image.Read(input)
     if err != nil {
         log.Fatal(err)
     }
 ```
-2. Hide a message into the `gosteganograpy.Image`
+2. Hide the message into the image
 ```go
     // hide a message, it returns the number of bits writen
     secret := []byte("secret number: 1234")
-    nbits, err := image.Hide(secret)
+    nbits, err := img.Hide(secret)
     if err != nil {
         log.Fatal(err)
     }
 ```
-3. Write the `gosteganograpy.Image` with the hidden message into a file
+3. Write the image with the hidden message into a file
 ```go
-    // store the output
-    if err := image.WriteFile("./output.png"); err != nil {
+   // store the output
+    output, err := os.Create("./output.png")
+    if err != nil {
+        fmt.Println(err)
+        return
+    }
+    defer output.Close()
+    if err := img.Write(output); err != nil {
         log.Fatal(err)
     }
 ```
@@ -66,17 +124,23 @@ go get github.com/lucasmenendez/gosteganography
 
 1. Open image file
 ```go
-    // open the input image
-    image, err := gosteganography.OpenFile("./input.png")
+    // open the output image
+    output, err := os.Open("./output.png")
+    if err != nil {
+        fmt.Println(err)
+        return
+    }
+    defer output.Close()
+    img, err := image.Read(output)
     if err != nil {
         log.Fatal(err)
     }
 ```
 
-2. Unhide the message that the `gosteganograpy.Image` contains with the number of bits written
+2. Unhide the message that the image contains with the number of bits written
 ```go
     // get hided message using the number of bits
-    secret := image.Unhide(nbits)
+    secret := img.Unhide(nbits)
     fmt.Println(string(secret))
 ```
 
@@ -92,26 +156,38 @@ go get github.com/lucasmenendez/gosteganography
     import (
         "fmt"
 
-        "github.com/lucasmenendez/gosteganography"
+        "github.com/lucasmenendez/gosteganography/image"
     )
 
     func main() {
         // open the input image
-        image, err := gosteganography.OpenFile("./input.png")
+        input, err := os.Open("./input.png")
+        if err != nil {
+            fmt.Println(err)
+            return
+        }
+        defer input.Close()
+        img, err := image.Read(input)
         if err != nil {
             log.Fatal(err)
         }
         // hide a message, it returns the number of bits writen
         secret := []byte("secret number: 1234")
-        nbits, err := image.Hide(secret)
+        nbits, err := img.Hide(secret)
         if err != nil {
             log.Fatal(err)
         }
         // get hided message using the number of bits
-        recovered := image.Unhide(nbits)
+        recovered := img.Unhide(nbits)
         fmt.Println(string(recovered))
         // store the output
-        if err := image.WriteFile("./output.png"); err != nil {
+        output, err := os.Create("./output.png")
+        if err != nil {
+            fmt.Println(err)
+            return
+        }
+        defer output.Close()
+        if err := img.Write(output); err != nil {
             log.Fatal(err)
         }
     }

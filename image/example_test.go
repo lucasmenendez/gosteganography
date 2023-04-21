@@ -14,6 +14,7 @@ func Example() {
 		fmt.Println(err)
 		return
 	}
+	defer input.Close()
 	// open the input image
 	image, err := Read(input)
 	if err != nil {
