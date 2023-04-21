@@ -8,7 +8,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/lucasmenendez/gosteganography"
+	"github.com/lucasmenendez/gosteganography/image"
 )
 
 var helpMessage = `
@@ -90,7 +90,7 @@ func hide(args ...string) error {
 			return fmt.Errorf("error reading message file: %w", err)
 		}
 		// reading image from imput file
-		img, err := gosteganography.Read(inputFd)
+		img, err := image.Read(inputFd)
 		if err != nil {
 			return err
 		}
@@ -136,7 +136,7 @@ func unhide(args ...string) error {
 		}
 		defer inputFd.Close()
 		// reading image from imput file
-		img, err := gosteganography.Read(inputFd)
+		img, err := image.Read(inputFd)
 		if err != nil {
 			return err
 		}

@@ -4,7 +4,7 @@
 // gosteganography is a simple implementation of the LSB steganography algorithm
 // in go, which uses the least significant bit (LSB) of each colour component
 // (RGB) of each pixel of an image to hide a given message.
-package gosteganography
+package image
 
 import (
 	"image"
