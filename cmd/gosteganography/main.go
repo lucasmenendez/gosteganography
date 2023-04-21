@@ -70,72 +70,82 @@ func main() {
 
 func hide(args ...string) error {
 	// parse args
-	if len(args) != 3 {
+	switch {
+	case len(args) == 0 || args[0] == "help":
+		fmt.Println(hideMessage)
+		return nil
+	case len(args) != 3:
 		return fmt.Errorf("bad arguments")
+	default:
+		input, message, output := args[0], args[1], args[2]
+		// open input image
+		inputFd, err := os.Open(input)
+		if err != nil {
+			return fmt.Errorf("error opening input image: %w", err)
+		}
+		defer inputFd.Close()
+		// reading message file content
+		secretMessage, err := os.ReadFile(message)
+		if err != nil {
+			return fmt.Errorf("error reading message file: %w", err)
+		}
+		// reading image from imput file
+		img, err := gosteganography.Read(inputFd)
+		if err != nil {
+			return err
+		}
+		// hide message conntent and gets the number of bits written
+		nbits, err := img.Hide(secretMessage)
+		if err != nil {
+			return err
+		}
+		// create output image file
+		outputFd, err := os.Create(output)
+		if err != nil {
+			return fmt.Errorf("error creating output image file: %w", err)
+		}
+		defer outputFd.Close()
+		// wirte the output image in the created file
+		if err := img.Write(outputFd); err != nil {
+			return fmt.Errorf("error writting output image file: %w", err)
+		}
+		// print the number of bits written
+		fmt.Println("bits written: ", nbits)
+		return nil
 	}
-	input, message, output := args[0], args[1], args[2]
-	// open input image
-	inputFd, err := os.Open(input)
-	if err != nil {
-		return fmt.Errorf("error opening input image: %w", err)
-	}
-	defer inputFd.Close()
-	// reading message file content
-	secretMessage, err := os.ReadFile(message)
-	if err != nil {
-		return fmt.Errorf("error reading message file: %w", err)
-	}
-	// reading image from imput file
-	img, err := gosteganography.Read(inputFd)
-	if err != nil {
-		return err
-	}
-	// hide message conntent and gets the number of bits written
-	nbits, err := img.Hide(secretMessage)
-	if err != nil {
-		return err
-	}
-	// create output image file
-	outputFd, err := os.Create(output)
-	if err != nil {
-		return fmt.Errorf("error creating output image file: %w", err)
-	}
-	defer outputFd.Close()
-	// wirte the output image in the created file
-	if err := img.Write(outputFd); err != nil {
-		return fmt.Errorf("error writting output image file: %w", err)
-	}
-	// print the number of bits written
-	fmt.Println("bits written: ", nbits)
-	return nil
 }
 
 func unhide(args ...string) error {
 	// parse args
-	if len(args) != 3 {
+	switch {
+	case len(args) == 0 || args[0] == "help":
+		fmt.Println(unhideMessage)
+		return nil
+	case len(args) != 3:
 		return fmt.Errorf("bad arguments")
+	default:
+		input, message := args[0], args[1]
+		nbits, err := strconv.Atoi(args[2])
+		if err != nil {
+			return fmt.Errorf("requires a valid number of bits")
+		}
+		// open input image
+		inputFd, err := os.Open(input)
+		if err != nil {
+			return fmt.Errorf("error opening input image: %w", err)
+		}
+		defer inputFd.Close()
+		// reading image from imput file
+		img, err := gosteganography.Read(inputFd)
+		if err != nil {
+			return err
+		}
+		// retrieve the message content from the image
+		secretMessage := img.Unhide(nbits)
+		// write in the message file
+		if err := os.WriteFile(message, secretMessage, os.ModePerm); err != nil {
+			return fmt.Errorf("error writting message file: %w", err)
+		}
+		return nil
 	}
-	input, message := args[0], args[1]
-	nbits, err := strconv.Atoi(args[2])
-	if err != nil {
-		return fmt.Errorf("requires a valid number of bits")
-	}
-	// open input image
-	inputFd, err := os.Open(input)
-	if err != nil {
-		return fmt.Errorf("error opening input image: %w", err)
-	}
-	defer inputFd.Close()
-	// reading image from imput file
-	img, err := gosteganography.Read(inputFd)
-	if err != nil {
-		return err
-	}
-	// retrieve the message content from the image
-	secretMessage := img.Unhide(nbits)
-	// write in the message file
-	if err := os.WriteFile(message, secretMessage, os.ModePerm); err != nil {
-		return fmt.Errorf("error writting message file: %w", err)
-	}
-	return nil
 }
