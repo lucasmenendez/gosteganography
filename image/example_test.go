@@ -9,7 +9,7 @@ import (
 )
 
 func Example() {
-	input, err := os.Open("./input.png")
+	input, err := os.Open(testImage)
 	if err != nil {
 		fmt.Println(err)
 		return

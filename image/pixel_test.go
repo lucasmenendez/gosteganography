@@ -9,8 +9,6 @@ import (
 	"testing"
 )
 
-const testImage = "./input.png"
-
 func TestPixels_from(t *testing.T) {
 	input, err := os.Open(testImage)
 	if err != nil {

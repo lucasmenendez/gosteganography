@@ -9,8 +9,10 @@ import (
 	"testing"
 )
 
+const testImage = "../input.png"
+
 func TestEnd2End(t *testing.T) {
-	input, err := os.Open("./input.png")
+	input, err := os.Open(testImage)
 	if err != nil {
 		t.Errorf("expected nil, got %v", err)
 	}
