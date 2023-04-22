@@ -39,6 +39,10 @@ However, it is worth noting that LSB steganography is a relatively simple and ea
 
     Lets try:
 
+<img src="./demo.gif">
+
+3. **If you need help...**
+
 ```sh
 $ > gosteganography help
 
